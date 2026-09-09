@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 215 28% 17%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 28% 17%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 28% 17%;
+    --primary: 210 100% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 20% 94%;
+    --secondary-foreground: 215 28% 17%;
+    --muted: 210 20% 95%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 195 80% 90%;
+    --accent-foreground: 195 100% 25%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 214 20% 88%;
+    --input: 214 20% 88%;
+    --ring: 210 100% 45%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --chart-1: 210 100% 45%;
+    --chart-2: 142 71% 45%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 215 28% 7%;
+    --foreground: 210 20% 92%;
+    --card: 215 28% 10%;
+    --card-foreground: 210 20% 92%;
+    --popover: 215 28% 10%;
+    --popover-foreground: 210 20% 92%;
+    --primary: 210 100% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 215 28% 16%;
+    --secondary-foreground: 210 20% 92%;
+    --muted: 215 28% 16%;
+    --muted-foreground: 215 16% 60%;
+    --accent: 195 50% 25%;
+    --accent-foreground: 195 80% 80%;
+    --destructive: 0 63% 42%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 215 28% 20%;
+    --input: 215 28% 20%;
+    --ring: 210 100% 55%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --chart-1: 210 100% 55%;
+    --chart-2: 142 71% 45%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .issue-fatal {
+    @apply border-red-300 bg-red-50 text-red-700;
+  }
+  .issue-error {
+    @apply border-red-200 bg-red-50/50 text-red-600;
+  }
+  .issue-warning {
+    @apply border-amber-200 bg-amber-50/50 text-amber-700;
+  }
+  .issue-info {
+    @apply border-blue-200 bg-blue-50/50 text-blue-600;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* CodeMirror dark theme adjustments */
+.cm-editor {
+  background-color: rgb(2 6 23) !important;
+  height: 100% !important;
+}
+.cm-editor .cm-gutters {
+  background-color: rgb(15 23 42) !important;
+  border-color: rgb(30 41 59) !important;
+}
+.cm-editor.cm-focused {
+  outline: none !important;
+}
