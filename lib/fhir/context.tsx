@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import { FhirClient, FhirError } from './client';
 import { DemoFhirClient } from './demo-client';
 import type { SmartConfiguration } from './types';
@@ -50,6 +50,7 @@ export interface FhirContextValue {
   completeSmartCallback: () => Promise<void>;
   disconnect: () => void;
   refreshAuth: () => Promise<void>;
+  retryConnection: () => void;
 }
 
 const FhirContext = createContext<FhirContextValue | null>(null);
@@ -60,21 +61,18 @@ export function useFhir(): FhirContextValue {
   return ctx;
 }
 
-export function FhirProvider({ children }: { children: React.ReactNode }) {
-  // Start in demo mode immediately so the app is usable without a network connection.
-  const demoClientRef = useRef<UnifiedFhirClient | null>(null);
-  if (!demoClientRef.current) {
-    demoClientRef.current = new DemoFhirClient({ baseUrl: 'demo://fhir-studio' }) as unknown as UnifiedFhirClient;
-  }
+const HAPI_FHIR_URL = 'https://hapi.fhir.org/baseR4';
 
-  const [baseUrl, setBaseUrl] = useState('demo://fhir-studio');
-  const [mode, setMode] = useState<ConnectionMode>('demo');
-  const [status, setStatus] = useState<ConnectionStatus>('connected');
+export function FhirProvider({ children }: { children: React.ReactNode }) {
+  // Start in "connecting" state — we auto-connect to hapi.fhir.org on mount.
+  const [baseUrl, setBaseUrl] = useState('');
+  const [mode, setMode] = useState<ConnectionMode>('public');
+  const [status, setStatus] = useState<ConnectionStatus>('disconnected');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [auth, setAuth] = useState<AuthState>({});
   const [smartConfig, setSmartConfig] = useState<SmartConfiguration | null>(null);
   const [corsProxy, setCorsProxy] = useState('');
-  const clientRef = useRef<UnifiedFhirClient | null>(demoClientRef.current);
+  const clientRef = useRef<UnifiedFhirClient | null>(null);
   const tokenUrlRef = useRef<string>('');
 
   const setClient = useCallback((url: string, token?: string, proxy?: string) => {
@@ -228,6 +226,35 @@ export function FhirProvider({ children }: { children: React.ReactNode }) {
     smart.clearSmartSession();
   }, []);
 
+  const connectToHapi = useCallback(async () => {
+    setStatus('connecting');
+    setErrorMessage(null);
+    try {
+      const temp = new FhirClient({ baseUrl: HAPI_FHIR_URL });
+      const cap = await temp.capabilityStatement();
+      if (!cap.fhirVersion?.startsWith('4')) {
+        setErrorMessage(
+          `Server reports FHIR version ${cap.fhirVersion || 'unknown'} — this app targets R4 (4.x.x).`,
+        );
+        setStatus('error');
+        return;
+      }
+      clientRef.current = new FhirClient({ baseUrl: HAPI_FHIR_URL }) as unknown as UnifiedFhirClient;
+      setBaseUrl(HAPI_FHIR_URL);
+      setMode('public');
+      setStatus('connected');
+    } catch (err) {
+      const msg = err instanceof FhirError ? err.message : err instanceof Error ? err.message : 'Connection failed';
+      setErrorMessage(msg);
+      setStatus('error');
+    }
+  }, []);
+
+  // Auto-connect to hapi.fhir.org on mount
+  useEffect(() => {
+    connectToHapi();
+  }, [connectToHapi]);
+
   const value: FhirContextValue = {
     baseUrl,
     mode,
@@ -242,6 +269,7 @@ export function FhirProvider({ children }: { children: React.ReactNode }) {
     connectDemo,
     connectSmart,
     completeSmartCallback,
+    retryConnection: connectToHapi,
     disconnect,
     refreshAuth,
   };

@@ -101,6 +101,9 @@ function FhirApp() {
               Patient: {auth.patientId}
             </Badge>
           )}
+          <span className="hidden text-xs text-muted-foreground lg:inline">
+            Created by Dr Prabath Jayathissa
+          </span>
           <Button variant="ghost" size="sm" onClick={disconnect}>
             Disconnect
           </Button>

@@ -85,4 +85,3 @@ Alternatively, you can deploy to any platform that supports Next.js (Vercel, AWS
 - **Tailwind CSS** + **shadcn/ui** components
 - **CodeMirror** for JSON editing
 - **Lucide React** for icons
-# FHIR_Studio
